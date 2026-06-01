@@ -1,0 +1,129 @@
+<div class="upload-container">
+  <div class="upload-header">
+    <h1>Încărcare Fișier Excel</h1>
+    <p>Trage fișierul .xlsx sau dă click pentru a selecta</p>
+  </div>
+
+  @if (!uploadResult()) {
+    <div 
+      class="upload-zone"
+      [class.dragging]="isDragging()"
+      [class.uploading]="isUploading()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      data-testid="upload-zone">
+      
+      <input 
+        type="file" 
+        id="file-input" 
+        accept=".xlsx" 
+        (change)="onFileSelect($event)"
+        data-testid="file-input"
+        hidden>
+      
+      @if (!isUploading()) {
+        <div class="upload-content">
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+          </div>
+          <p class="main-text">Trage fișierul Excel aici</p>
+          <p class="sub-text">sau</p>
+          <label for="file-input" class="browse-btn" data-testid="browse-btn">Selectează Fișier</label>
+          <p class="hint">Acceptat: .xlsx (Excel 2007+)</p>
+        </div>
+      } @else {
+        <div class="uploading-content">
+          <div class="spinner"></div>
+          <p class="upload-status">Se procesează fișierul...</p>
+          <div class="progress-bar">
+            <div class="progress" [style.width.%]="uploadProgress()"></div>
+          </div>
+          <p class="progress-text">{{ uploadProgress() }}%</p>
+        </div>
+      }
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-message" data-testid="error-message">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+      </svg>
+      <span>{{ error() }}</span>
+      <button (click)="error.set(null)" class="dismiss-btn">×</button>
+    </div>
+  }
+
+  @if (uploadResult(); as result) {
+    <div class="upload-result" data-testid="upload-result">
+      <div class="result-header">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+        </div>
+        <div class="result-info">
+          <h2>Fișier Procesat cu Succes!</h2>
+          <p>{{ result.session?.fileName || 'Fișier necunoscut' }}</p>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <span class="number">{{ result.stats.total }}</span>
+          <span class="label">Tichete Extrase</span>
+        </div>
+        <div class="stat-card bugs">
+          <span class="number">{{ result.stats.bugs }}</span>
+          <span class="label">Bug-uri</span>
+        </div>
+        <div class="stat-card features">
+          <span class="number">{{ result.stats.features }}</span>
+          <span class="label">Features</span>
+        </div>
+        <div class="stat-card ai">
+          <span class="number">{{ result.stats.aiAnalyzed }}</span>
+          <span class="label">Analizate AI</span>
+        </div>
+      </div>
+
+      @if (result.stats.withDuplicates > 0) {
+        <div class="duplicates-warning">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+          </svg>
+          <span>{{ result.stats.withDuplicates }} tichete au potențiale duplicate</span>
+        </div>
+      }
+
+      @if (result.session.columnMappings) {
+        <div class="column-mappings">
+          <h4>Mapări de Coloane Detectate:</h4>
+          <div class="mappings">
+            <span *ngFor="let item of result.session.columnMappings | keyvalue" class="mapping-tag">
+              {{ item.key }}: {{ item.value }}
+            </span>
+          </div>
+        </div>
+      }
+
+      <div class="result-actions">
+        <button class="btn-secondary" (click)="reset()" data-testid="upload-another-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          Încărcă Alt Fișier
+        </button>
+        <button class="btn-primary" (click)="viewTickets()" data-testid="view-tickets-btn">
+          Vezi Tichetele
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+</div>

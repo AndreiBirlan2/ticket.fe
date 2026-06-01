@@ -1,0 +1,90 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          <path d="M9 14l2 2 4-4"/>
+        </svg>
+        <span>TicketAI</span>
+      </div>
+      <h1>{{ isLoginMode() ? 'Bine ai revenit!' : 'Creează cont' }}</h1>
+      <p>{{ isLoginMode() ? 'Autentifică-te pentru a continua' : 'Înregistrează-te pentru a începe' }}</p>
+    </div>
+
+    <div class="divider">
+      <span>sau</span>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="auth-form">
+      @if (!isLoginMode()) {
+        <div class="form-group">
+          <label for="name">Nume</label>
+          <input 
+            type="text" 
+            id="name" 
+            [ngModel]="name()" 
+            (ngModelChange)="name.set($event)"
+            name="name"
+            placeholder="Numele tău"
+            data-testid="name-input">
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          [ngModel]="email()" 
+          (ngModelChange)="email.set($event)"
+            name="email"
+          placeholder="email@exemplu.com"
+          data-testid="email-input">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Parolă</label>
+        <input 
+          type="password" 
+          id="password" 
+          [ngModel]="password()" 
+          (ngModelChange)="password.set($event)"
+            name="password"
+          placeholder="{{ isLoginMode() ? 'Parola ta' : 'Minim 6 caractere' }}"
+          data-testid="password-input">
+      </div>
+
+      @if (error()) {
+        <div class="error-message" data-testid="auth-error">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          {{ error() }}
+        </div>
+      }
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading()" data-testid="submit-btn">
+        @if (!isLoading()) {
+          <span>{{ isLoginMode() ? 'Autentificare' : 'Creează cont' }}</span>
+        } @else {
+          <div class="spinner"></div>
+        }
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      @if (isLoginMode()) {
+        <p>
+          Nu ai cont? 
+          <button (click)="toggleMode()" data-testid="toggle-register">Înregistrează-te</button>
+        </p>
+      } @else {
+        <p>
+          Ai deja cont? 
+          <button (click)="toggleMode()" data-testid="toggle-login">Autentifică-te</button>
+        </p>
+      }
+    </div>
+  </div>
+</div>
